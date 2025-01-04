@@ -279,6 +279,15 @@
                         <span class="tooltiptext">Start a new live stream</span>
                     </div>
                     <div class="tooltip">
+                      <button id="camera-switch" class="button button-outline">
+                          <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M18 10c0-3.3-2.7-6-6-6-2.3 0-4.3 1.3-5.2 3l-2.6-2a8 8 0 0 1 12.8 10.4l-2.6-2C16.3 13.1 18 11.7 18 10zM6 14c0 3.3 2.7 6 6 6 2.3 0 4.3-1.3 5.2-3l2.6 2a8 8 0 0 1-12.8-10.4l2.6 2C7.7 12.9 6 14.3 6 14z"></path>
+                          </svg>
+                          Switch Camera
+                      </button>
+                      <span class="tooltiptext">Switch between front and back cameras</span>
+                    </div>
+                    <div class="tooltip">
                         <button id="generate-link" class="button button-outline" disabled>
                             <svg class="icon" viewBox="0 0 24 24">
                                 <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
@@ -296,40 +305,56 @@
 
     <footer>
         <div class="container">
-            <p>&copy; 2023 LiveStream Pro. All rights reserved.</p>
+            <p>© 2023 LiveStream Pro. All rights reserved.</p>
         </div>
     </footer>
 
     <script>
-        // Theme toggle functionality
-        const themeToggle = document.getElementById('theme-toggle');
-        const themeToggleIcon = document.getElementById('theme-toggle-icon');
-        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+      // Theme toggle functionality
+      const themeToggle = document.getElementById('theme-toggle');
+      const themeToggleIcon = document.getElementById('theme-toggle-icon');
+      const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
 
-        function setTheme(isDark) {
-            document.body.classList.toggle('dark', isDark);
-            themeToggleIcon.innerHTML = isDark 
-                ? '<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>'
-                : '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        }
+      function setTheme(isDark) {
+          document.body.classList.toggle('dark', isDark);
+          themeToggleIcon.innerHTML = isDark
+              ? '<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>'
+              : '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+          localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      }
 
-        // Set initial theme
-        const savedTheme = localStorage.getItem('theme');
-        setTheme(savedTheme === 'dark' || (savedTheme === null && prefersDarkScheme.matches));
+      // Set initial theme
+      const savedTheme = localStorage.getItem('theme');
+      setTheme(savedTheme === 'dark' || (savedTheme === null && prefersDarkScheme.matches));
 
-        themeToggle.addEventListener('click', () => {
-            setTheme(!document.body.classList.contains('dark'));
-        });
+      themeToggle.addEventListener('click', () => {
+          setTheme(!document.body.classList.contains('dark'));
+      });
 
         // Live streaming functionality
         const videoFeed = document.getElementById('video-feed');
         const streamToggle = document.getElementById('stream-toggle');
         const generateLinkBtn = document.getElementById('generate-link');
         const shareLinkInput = document.getElementById('share-link');
+        const cameraSwitchBtn = document.getElementById('camera-switch');
 
         let stream;
         let peerConnection;
+        let currentCamera = 'user'; // 'user' for front camera, 'environment' for back
+
+        async function getMediaStream() {
+          try {
+            const constraints = {
+                video: { facingMode: currentCamera },
+                audio: true
+            };
+              return await navigator.mediaDevices.getUserMedia(constraints);
+          } catch (error) {
+              console.error('Error accessing media devices:', error);
+              alert('Unable to access camera and microphone. Please check your permissions.');
+              return null;
+          }
+        }
 
         async function setupWebRTC() {
             peerConnection = new RTCPeerConnection({
@@ -337,10 +362,12 @@
             });
 
             peerConnection.onicecandidate = (event) => {
-                if (event.candidate) {
-                    // Send the candidate to the remote peer
-                    console.log('New ICE candidate:', event.candidate);
+              if (event.candidate) {
+                  const link = localStorage.getItem('streamLink');
+                if(link) {
+                    localStorage.setItem(link + '_candidate', JSON.stringify(event.candidate));
                 }
+              }
             };
 
             peerConnection.ontrack = (event) => {
@@ -350,41 +377,34 @@
         }
 
         async function startStream() {
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                videoFeed.srcObject = stream;
-                streamToggle.innerHTML = `
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <rect x="9" y="9" width="6" height="6"></rect>
-                    </svg>
-                    Stop Stream
-                `;
-                generateLinkBtn.disabled = false;
+            stream = await getMediaStream();
 
-                await setupWebRTC();
+            if (!stream) return;
 
-                stream.getTracks().forEach(track => {
-                    peerConnection.addTrack(track, stream);
-                });
+            videoFeed.srcObject = stream;
+            streamToggle.innerHTML = `
+                <svg class="icon" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <rect x="9" y="9" width="6" height="6"></rect>
+                </svg>
+                Stop Stream
+            `;
+            generateLinkBtn.disabled = false;
 
-                const offer = await peerConnection.createOffer();
-                await peerConnection.setLocalDescription(offer);
+            await setupWebRTC();
 
-                // In a real application, you would send this offer to a signaling server
-                console.log('Offer created:', offer);
+            stream.getTracks().forEach(track => {
+                peerConnection.addTrack(track, stream);
+            });
+            
+            // Animate the start of the stream
+            gsap.from(videoFeed, { 
+              duration: 1, 
+              opacity: 0, 
+              scale: 0.8, 
+              ease: 'elastic.out(1, 0.5)'
+          });
 
-                // Animate the start of the stream
-                gsap.from(videoFeed, { 
-                    duration: 1, 
-                    opacity: 0, 
-                    scale: 0.8, 
-                    ease: 'elastic.out(1, 0.5)'
-                });
-            } catch (error) {
-                console.error('Error starting stream:', error);
-                alert('Unable to access camera and microphone. Please check your permissions.');
-            }
         }
 
         function stopStream() {
@@ -401,11 +421,13 @@
             `;
             generateLinkBtn.disabled = true;
             shareLinkInput.style.display = 'none';
+            localStorage.removeItem(localStorage.getItem('streamLink'));
 
             if (peerConnection) {
                 peerConnection.close();
+                peerConnection = null;
             }
-
+            
             // Animate the end of the stream
             gsap.to(videoFeed, { 
                 duration: 0.5, 
@@ -420,21 +442,27 @@
         }
 
         streamToggle.addEventListener('click', () => {
-            if (streamToggle.textContent.trim() === 'Start Stream') {
-                startStream();
-            } else {
-                stopStream();
-            }
+          if (streamToggle.textContent.trim() === 'Start Stream') {
+            startStream();
+        } else {
+            stopStream();
+        }
         });
 
-        generateLinkBtn.addEventListener('click', () => {
+        generateLinkBtn.addEventListener('click', async () => {
             const randomId = Math.random().toString(36).substring(2, 15);
             const link = `https://livestreampro.com/stream/${randomId}`;
             shareLinkInput.value = link;
             shareLinkInput.style.display = 'block';
+            localStorage.setItem('streamLink', link);
 
-            // Animate the link generation
-            gsap.from(shareLinkInput, { 
+              const offer = await peerConnection.createOffer();
+              await peerConnection.setLocalDescription(offer);
+
+                localStorage.setItem(link, JSON.stringify(offer));
+            
+              // Animate the link generation
+              gsap.from(shareLinkInput, { 
                 duration: 0.5, 
                 y: 20, 
                 opacity: 0, 
@@ -442,6 +470,63 @@
             });
         });
 
+        // Handle camera switching
+        cameraSwitchBtn.addEventListener('click', async () => {
+          if (!stream) return;
+            
+            stream.getTracks().forEach(track => track.stop());
+            
+            currentCamera = currentCamera === 'user' ? 'environment' : 'user';
+            await startStream();
+            
+        });
+        // Check if it's a viewer
+        const path = window.location.pathname;
+
+        if (path.startsWith('/stream/')) {
+            const streamId = path.split('/')[2];
+          const offerString = localStorage.getItem(streamId);
+
+            if (offerString) {
+              const offer = JSON.parse(offerString);
+              startStreamForViewer(offer, streamId);
+            } else {
+              alert("No stream found for this link");
+            }
+        }
+
+       async function startStreamForViewer(offer, streamId) {
+         streamToggle.disabled = true;
+         generateLinkBtn.disabled = true;
+
+            try {
+              await setupWebRTC();
+              await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+
+              const answer = await peerConnection.createAnswer();
+              await peerConnection.setLocalDescription(answer);
+
+              //Get candiate of the stream and add them to the peer
+              const candidateString = localStorage.getItem(streamId + '_candidate');
+
+                if(candidateString) {
+                const candidate = JSON.parse(candidateString);
+                await peerConnection.addIceCandidate(candidate);
+               }
+              
+                // Animate the start of the stream
+                gsap.from(videoFeed, { 
+                  duration: 1, 
+                  opacity: 0, 
+                  scale: 0.8, 
+                  ease: 'elastic.out(1, 0.5)'
+                });
+
+          } catch (error) {
+            console.error("Error starting the stream as a viewer", error);
+            alert("Failed to start the stream for the viewer.")
+          }
+        }
         // Clean up on page unload
         window.addEventListener('beforeunload', () => {
             if (stream) {
@@ -449,6 +534,7 @@
             }
             if (peerConnection) {
                 peerConnection.close();
+                peerConnection = null;
             }
         });
     </script>
