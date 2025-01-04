@@ -270,7 +270,7 @@
         <p>© 2024 LiveStream Pro. All rights reserved. Web Developed By shamase.co</p>
     </footer>
 
-    <script>
+        <script>
         const themeToggle = document.getElementById('theme-toggle');
         const body = document.body;
         const localVideo = document.getElementById('local-video');
@@ -341,15 +341,9 @@
                 startStreamBtn.textContent = 'Stop Stream';
                 isStreaming = true;
 
-                 // Replace with your actual server-side logic
-                //Example: Assuming we get a stream ID from the server:
-                 const streamId = generateStreamId()
-                
-                 const streamUrl = `https://samkelisomaseko.github.io/Live-Stream/${streamId}` 
-                
-                 shareLinkInput.value = streamUrl;
+                 // Get current page URL and set as share link
+                 shareLinkInput.value = window.location.href;
                  copyButton.disabled = false;
-                
                 
             } catch (error) {
                 console.error('Error starting stream:', error);
@@ -372,10 +366,7 @@
                 copyButton.disabled = true
             }
         };
-        
-          const generateStreamId = () =>{
-               return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
-          }
+
 
         const switchCamera = () => {
             if (cameras.length === 0 || !isStreaming) {
