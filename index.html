@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LiveStream Pro</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&family=Exo+2:wght@200;400;700&family=Audiowide&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background: 0 0% 100%;
+            --foreground: 222.2 84% 4.9%;
+            --card: 0 0% 100%;
+            --card-foreground: 222.2 84% 4.9%;
+            --popover: 0 0% 100%;
+            --popover-foreground: 222.2 84% 4.9%;
+            --primary: 221.2 83.2% 53.3%;
+            --primary-foreground: 210 40% 98%;
+            --secondary: 210 40% 96.1%;
+            --secondary-foreground: 222.2 47.4% 11.2%;
+            --muted: 210 40% 96.1%;
+            --muted-foreground: 215.4 16.3% 46.9%;
+            --accent: 210 40% 96.1%;
+            --accent-foreground: 222.2 47.4% 11.2%;
+            --destructive: 0 84.2% 60.2%;
+            --destructive-foreground: 210 40% 98%;
+            --border: 214.3 31.8% 91.4%;
+            --input: 214.3 31.8% 91.4%;
+            --ring: 221.2 83.2% 53.3%;
+            --radius: 0.5rem;
+        }
+
+        .dark {
+            --background: 222.2 84% 4.9%;
+            --foreground: 210 40% 98%;
+            --card: 222.2 84% 4.9%;
+            --card-foreground: 210 40% 98%;
+            --popover: 222.2 84% 4.9%;
+            --popover-foreground: 210 40% 98%;
+            --primary: 217.2 91.2% 59.8%;
+            --primary-foreground: 222.2 47.4% 11.2%;
+            --secondary: 217.2 32.6% 17.5%;
+            --secondary-foreground: 210 40% 98%;
+            --muted: 217.2 32.6% 17.5%;
+            --muted-foreground: 215 20.2% 65.1%;
+            --accent: 217.2 32.6% 17.5%;
+            --accent-foreground: 210 40% 98%;
+            --destructive: 0 62.8% 30.6%;
+            --destructive-foreground: 210 40% 98%;
+            --border: 217.2 32.6% 17.5%;
+            --input: 217.2 32.6% 17.5%;
+            --ring: 224.3 76.3% 48%;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+            line-height: 1.5;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            width: clamp(16rem, 90vw, 75rem);
+            margin: 0 auto;
+            padding: 0 clamp(1rem, 3vw, 2rem);
+        }
+
+        header {
+            border-bottom: 1px solid hsl(var(--border));
+            padding: clamp(0.5rem, 2vw, 1rem) 0;
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: bold;
+        }
+
+        main {
+            padding: clamp(1rem, 4vw, 2rem) 0;
+        }
+
+        .card {
+            background-color: hsl(var(--card));
+            border-radius: var(--radius);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            max-width: 48rem;
+            margin: 0 auto;
+        }
+
+        .card-content {
+            padding: clamp(1rem, 3vw, 1.5rem);
+        }
+
+        .video-container {
+            aspect-ratio: 16 / 9;
+            background-color: #000;
+            border-radius: calc(var(--radius) - 2px);
+            overflow: hidden;
+            margin-bottom: clamp(0.5rem, 2vw, 1rem);
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: clamp(0.5rem, 2vw, 1rem);
+            justify-content: center;
+        }
+
+        .button {
+            font-family: 'Exo 2', sans-serif;
+            background-color: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+            border: none;
+            border-radius: var(--radius);
+            padding: clamp(0.4rem, 1.5vw, 0.75rem) clamp(0.75rem, 2vw, 1.25rem);
+            font-size: clamp(0.75rem, 2vw, 1rem);
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .button:hover {
+            background-color: hsl(var(--primary) / 0.9);
+            transform: translateY(-1px);
+        }
+
+        .button:active {
+            transform: translateY(1px);
+        }
+
+        .button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .button-outline {
+            background-color: transparent;
+            border: 1px solid hsl(var(--border));
+            color: hsl(var(--foreground));
+        }
+
+        .button-outline:hover {
+            background-color: hsl(var(--accent));
+            color: hsl(var(--accent-foreground));
+        }
+
+        .input {
+            font-family: 'Rajdhani', sans-serif;
+            width: 100%;
+            padding: clamp(0.4rem, 1.5vw, 0.75rem);
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius);
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+            margin-top: clamp(0.75rem, 2vw, 1rem);
+            font-size: clamp(0.875rem, 2vw, 1rem);
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            font-family: 'Audiowide', cursive;
+            visibility: hidden;
+            width: 120px;
+            background-color: hsl(var(--popover));
+            color: hsl(var(--popover-foreground));
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: clamp(0.7rem, 1.5vw, 0.875rem);
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        footer {
+            font-family: 'Syncopate', sans-serif;
+            border-top: 1px solid hsl(var(--border));
+            padding: clamp(0.75rem, 2vw, 1rem) 0;
+            margin-top: clamp(1.5rem, 4vw, 2rem);
+            text-align: center;
+            font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+        }
+
+        .neon-glow {
+            text-shadow: 0 0 5px hsl(217.2 91.2% 59.8%), 
+                         0 0 10px hsl(217.2 91.2% 59.8%), 
+                         0 0 15px hsl(217.2 91.2% 59.8%), 
+                         0 0 20px hsl(217.2 91.2% 59.8%);
+        }
+
+        .icon {
+            width: clamp(1rem, 3vw, 1.5rem);
+            height: clamp(1rem, 3vw, 1.5rem);
+            fill: currentColor;
+        }
+
+        @media (max-width: 640px) {
+            .button-container {
+                flex-direction: column;
+            }
+
+            .button {
+                width: 100%;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .button, .tooltip .tooltiptext {
+                transition: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1 class="neon-glow">LiveStream Pro</h1>
+            <button id="theme-toggle" class="button button-outline" aria-label="Toggle dark mode">
+                <svg class="icon" viewBox="0 0 24 24" id="theme-toggle-icon">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="card">
+            <div class="card-content">
+                <div class="video-container">
+                    <video id="video-feed" autoplay playsinline muted></video>
+                </div>
+                <div class="button-container">
+                    <div class="tooltip">
+                        <button id="stream-toggle" class="button">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polygon points="10 8 16 12 10 16 10 8"></polygon>
+                            </svg>
+                            Start Stream
+                        </button>
+                        <span class="tooltiptext">Start a new live stream</span>
+                    </div>
+                    <div class="tooltip">
+                        <button id="generate-link" class="button button-outline" disabled>
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                            </svg>
+                            Generate Shareable Link
+                        </button>
+                        <span class="tooltiptext">Create a link to share your live stream</span>
+                    </div>
+                </div>
+                <input id="share-link" type="text" class="input" readonly placeholder="Generated share link will appear here" style="display: none;">
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 LiveStream Pro. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeToggleIcon = document.getElementById('theme-toggle-icon');
+        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+
+        function setTheme(isDark) {
+            document.body.classList.toggle('dark', isDark);
+            themeToggleIcon.innerHTML = isDark 
+                ? '<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>'
+                : '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        }
+
+        // Set initial theme
+        const savedTheme = localStorage.getItem('theme');
+        setTheme(savedTheme === 'dark' || (savedTheme === null && prefersDarkScheme.matches));
+
+        themeToggle.addEventListener('click', () => {
+            setTheme(!document.body.classList.contains('dark'));
+        });
+
+        // Live streaming functionality
+        const videoFeed = document.getElementById('video-feed');
+        const streamToggle = document.getElementById('stream-toggle');
+        const generateLinkBtn = document.getElementById('generate-link');
+        const shareLinkInput = document.getElementById('share-link');
+
+        let stream;
+        let peerConnection;
+
+        async function setupWebRTC() {
+            peerConnection = new RTCPeerConnection({
+                iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+            });
+
+            peerConnection.onicecandidate = (event) => {
+                if (event.candidate) {
+                    // Send the candidate to the remote peer
+                    console.log('New ICE candidate:', event.candidate);
+                }
+            };
+
+            peerConnection.ontrack = (event) => {
+                // This would be used by the receiving peer
+                videoFeed.srcObject = event.streams[0];
+            };
+        }
+
+        async function startStream() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                videoFeed.srcObject = stream;
+                streamToggle.innerHTML = `
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <rect x="9" y="9" width="6" height="6"></rect>
+                    </svg>
+                    Stop Stream
+                `;
+                generateLinkBtn.disabled = false;
+
+                await setupWebRTC();
+
+                stream.getTracks().forEach(track => {
+                    peerConnection.addTrack(track, stream);
+                });
+
+                const offer = await peerConnection.createOffer();
+                await peerConnection.setLocalDescription(offer);
+
+                // In a real application, you would send this offer to a signaling server
+                console.log('Offer created:', offer);
+
+                // Animate the start of the stream
+                gsap.from(videoFeed, { 
+                    duration: 1, 
+                    opacity: 0, 
+                    scale: 0.8, 
+                    ease: 'elastic.out(1, 0.5)'
+                });
+            } catch (error) {
+                console.error('Error starting stream:', error);
+                alert('Unable to access camera and microphone. Please check your permissions.');
+            }
+        }
+
+        function stopStream() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            videoFeed.srcObject = null;
+            streamToggle.innerHTML = `
+                <svg class="icon" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polygon points="10 8 16 12 10 16 10 8"></polygon>
+                </svg>
+                Start Stream
+            `;
+            generateLinkBtn.disabled = true;
+            shareLinkInput.style.display = 'none';
+
+            if (peerConnection) {
+                peerConnection.close();
+            }
+
+            // Animate the end of the stream
+            gsap.to(videoFeed, { 
+                duration: 0.5, 
+                opacity: 0, 
+                scale: 0.8, 
+                ease: 'power2.out',
+                onComplete: () => {
+                    videoFeed.style.opacity = 1;
+                    videoFeed.style.transform = 'scale(1)';
+                }
+            });
+        }
+
+        streamToggle.addEventListener('click', () => {
+            if (streamToggle.textContent.trim() === 'Start Stream') {
+                startStream();
+            } else {
+                stopStream();
+            }
+        });
+
+        generateLinkBtn.addEventListener('click', () => {
+            const randomId = Math.random().toString(36).substring(2, 15);
+            const link = `https://livestreampro.com/stream/${randomId}`;
+            shareLinkInput.value = link;
+            shareLinkInput.style.display = 'block';
+
+            // Animate the link generation
+            gsap.from(shareLinkInput, { 
+                duration: 0.5, 
+                y: 20, 
+                opacity: 0, 
+                ease: 'back.out(1.7)'
+            });
+        });
+
+        // Clean up on page unload
+        window.addEventListener('beforeunload', () => {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            if (peerConnection) {
+                peerConnection.close();
+            }
+        });
+    </script>
+</body>
+</html>
