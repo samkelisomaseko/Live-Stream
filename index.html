@@ -485,7 +485,7 @@
     generateLinkBtn.addEventListener('click', async () => {
         try {
           const randomId = Math.random().toString(36).substring(2, 15);
-          const link = `${window.location.origin}/stream/${randomId}`;
+          const link = `${window.location.origin}/index.html/${randomId}`;
           shareLinkInput.value = link;
           shareLinkInput.style.display = 'block';
           localStorage.setItem('streamLink', link);
