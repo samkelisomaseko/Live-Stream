@@ -1,581 +1,418 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LiveStream Pro</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&family=Exo+2:wght@200;400;700&family=Audiowide&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --background: 0 0% 100%;
-            --foreground: 222.2 84% 4.9%;
-            --card: 0 0% 100%;
-            --card-foreground: 222.2 84% 4.9%;
-            --popover: 0 0% 100%;
-            --popover-foreground: 222.2 84% 4.9%;
-            --primary: 221.2 83.2% 53.3%;
-            --primary-foreground: 210 40% 98%;
-            --secondary: 210 40% 96.1%;
-            --secondary-foreground: 222.2 47.4% 11.2%;
-            --muted: 210 40% 96.1%;
-            --muted-foreground: 215.4 16.3% 46.9%;
-            --accent: 210 40% 96.1%;
-            --accent-foreground: 222.2 47.4% 11.2%;
-            --destructive: 0 84.2% 60.2%;
-            --destructive-foreground: 210 40% 98%;
-            --border: 214.3 31.8% 91.4%;
-            --input: 214.3 31.8% 91.4%;
-            --ring: 221.2 83.2% 53.3%;
-            --radius: 0.5rem;
-        }
+        /* Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Electrolize&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Quantico:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700&display=swap');
 
-        .dark {
-            --background: 222.2 84% 4.9%;
-            --foreground: 210 40% 98%;
-            --card: 222.2 84% 4.9%;
-            --card-foreground: 210 40% 98%;
-            --popover: 222.2 84% 4.9%;
-            --popover-foreground: 210 40% 98%;
-            --primary: 217.2 91.2% 59.8%;
-            --primary-foreground: 222.2 47.4% 11.2%;
-            --secondary: 217.2 32.6% 17.5%;
-            --secondary-foreground: 210 40% 98%;
-            --muted: 217.2 32.6% 17.5%;
-            --muted-foreground: 215 20.2% 65.1%;
-            --accent: 217.2 32.6% 17.5%;
-            --accent-foreground: 210 40% 98%;
-            --destructive: 0 62.8% 30.6%;
-            --destructive-foreground: 210 40% 98%;
-            --border: 217.2 32.6% 17.5%;
-            --input: 217.2 32.6% 17.5%;
-            --ring: 224.3 76.3% 48%;
-        }
-
-        * {
-            box-sizing: border-box;
+        /* Default Font */
+        body {
+            font-family: 'Electrolize', sans-serif; /* Default Font */
             margin: 0;
             padding: 0;
-        }
-
-        body {
-            font-family: 'Rajdhani', sans-serif;
-            background-color: hsl(var(--background));
-            color: hsl(var(--foreground));
-            line-height: 1.5;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
             transition: background-color 0.3s, color 0.3s;
         }
 
-        .container {
-            width: clamp(16rem, 90vw, 75rem);
-            margin: 0 auto;
-            padding: 0 clamp(1rem, 3vw, 2rem);
-        }
-
+        /* Header */
         header {
-            border-bottom: 1px solid hsl(var(--border));
-            padding: clamp(0.5rem, 2vw, 1rem) 0;
-        }
-
-        header .container {
+            width: 100%;
+            padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            max-width: 600px;
+            box-sizing: border-box;
         }
 
-        h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: clamp(1.5rem, 4vw, 2.5rem);
-            font-weight: bold;
+        header h1 {
+           font-family: 'Orbitron', sans-serif;
+            margin: 0;
+            font-size: 2em;
+            color: #fff;
+            transition: color 0.3s;
         }
 
-        main {
-            padding: clamp(1rem, 4vw, 2rem) 0;
+        header .brightness-icon {
+            font-size: 1.5em;
+            cursor: pointer;
+            margin-right: 5px;
+            transition: color 0.3s;
         }
 
-        .card {
-            background-color: hsl(var(--card));
-            border-radius: var(--radius);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            overflow: hidden;
-            max-width: 48rem;
-            margin: 0 auto;
+        /* Main Content */
+        .stream-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            margin-top: 20px;
+            box-sizing: border-box;
         }
 
-        .card-content {
-            padding: clamp(1rem, 3vw, 1.5rem);
-        }
-
-        .video-container {
-            aspect-ratio: 16 / 9;
+        .stream-area {
+            width: 100%;
+            height: 300px;
             background-color: #000;
-            border-radius: calc(var(--radius) - 2px);
+            border-radius: 5px;
+            border: 1px solid #444;
+            margin-bottom: 20px;
             overflow: hidden;
-            margin-bottom: clamp(0.5rem, 2vw, 1rem);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: border 0.3s;
         }
 
-        video {
+        #local-video {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            display: none;
         }
 
         .button-container {
             display: flex;
-            flex-wrap: wrap;
-            gap: clamp(0.5rem, 2vw, 1rem);
-            justify-content: center;
-        }
-
-        .button {
-            font-family: 'Exo 2', sans-serif;
-            background-color: hsl(var(--primary));
-            color: hsl(var(--primary-foreground));
-            border: none;
-            border-radius: var(--radius);
-            padding: clamp(0.4rem, 1.5vw, 0.75rem) clamp(0.75rem, 2vw, 1.25rem);
-            font-size: clamp(0.75rem, 2vw, 1rem);
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.1s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .button:hover {
-            background-color: hsl(var(--primary) / 0.9);
-            transform: translateY(-1px);
-        }
-
-        .button:active {
-            transform: translateY(1px);
-        }
-
-        .button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .button-outline {
-            background-color: transparent;
-            border: 1px solid hsl(var(--border));
-            color: hsl(var(--foreground));
-        }
-
-        .button-outline:hover {
-            background-color: hsl(var(--accent));
-            color: hsl(var(--accent-foreground));
-        }
-
-        .input {
-            font-family: 'Rajdhani', sans-serif;
+            flex-direction: column;
             width: 100%;
-            padding: clamp(0.4rem, 1.5vw, 0.75rem);
-            border: 1px solid hsl(var(--border));
-            border-radius: var(--radius);
-            background-color: hsl(var(--background));
-            color: hsl(var(--foreground));
-            margin-top: clamp(0.75rem, 2vw, 1rem);
-            font-size: clamp(0.875rem, 2vw, 1rem);
+            max-width: 400px;
         }
 
-        .tooltip {
-            position: relative;
-            display: inline-block;
+        button {
+             font-family: 'Quantico', sans-serif;
+            background-color: #fff;
+            color: #000;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-bottom: 10px;
+            transition: background-color 0.3s, color 0.3s;
         }
 
-        .tooltip .tooltiptext {
-            font-family: 'Audiowide', cursive;
-            visibility: hidden;
-            width: 120px;
-            background-color: hsl(var(--popover));
-            color: hsl(var(--popover-foreground));
-            text-align: center;
-            border-radius: 6px;
-            padding: 5px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -60px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: clamp(0.7rem, 1.5vw, 0.875rem);
+        button:hover {
+            background-color: #ddd;
         }
 
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
+        .dark-theme button {
+            background-color: #333;
+            color: #fff;
         }
 
+        .dark-theme button:hover {
+            background-color: #555;
+        }
+
+        /* Footer */
         footer {
-            font-family: 'Syncopate', sans-serif;
-            border-top: 1px solid hsl(var(--border));
-            padding: clamp(0.75rem, 2vw, 1rem) 0;
-            margin-top: clamp(1.5rem, 4vw, 2rem);
+            font-family: 'Exo 2', sans-serif;
+            margin-top: 30px;
+            width: 100%;
+            max-width: 600px;
             text-align: center;
-            font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+            padding: 10px;
+            box-sizing: border-box;
+            transition: color 0.3s;
         }
 
-        .neon-glow {
-            text-shadow: 0 0 5px hsl(217.2 91.2% 59.8%),
-                         0 0 10px hsl(217.2 91.2% 59.8%),
-                         0 0 15px hsl(217.2 91.2% 59.8%),
-                         0 0 20px hsl(217.2 91.2% 59.8%);
-        }
-
-        .icon {
-            width: clamp(1rem, 3vw, 1.5rem);
-            height: clamp(1rem, 3vw, 1.5rem);
-            fill: currentColor;
-        }
-
-        .error-message {
-          color: hsl(var(--destructive));
-          margin-top: 0.5rem;
-          font-size: 0.875rem;
-          text-align: center;
-        }
-
-        @media (max-width: 640px) {
-            .button-container {
-                flex-direction: column;
+        /* Responsive Layout */
+        @media (max-width: 600px) {
+            header {
+                padding: 15px;
+                align-items: center;
             }
 
-            .button {
-                width: 100%;
+            header h1 {
+                font-size: 1.5em;
+            }
+
+            .stream-area {
+                height: 200px;
             }
         }
 
-        @media (prefers-reduced-motion: reduce) {
-            .button, .tooltip .tooltiptext {
-                transition: none;
-            }
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            transition: background-color 0.3s;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+        }
+
+        .close-modal {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close-modal:hover,
+        .close-modal:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .share-link-container {
+            word-wrap: break-word;
+            margin-top: 10px;
+        }
+
+        #share-link {
+            margin-bottom: 10px;
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        /* Dark Theme */
+        .dark-theme .stream-area {
+            border: 1px solid #666;
+        }
+
+        .dark-theme .modal-content {
+            background-color: #333;
+            color: #fff;
+            border: 1px solid #555;
+        }
+
+        .dark-theme .close-modal {
+            color: #ddd
+        }
+
+        .dark-theme .close-modal:hover,
+        .dark-theme .close-modal:focus {
+            color: #fff
+        }
+         
+          .dark-theme header h1 {
+          color: #ddd;
+        }
+      
+       .dark-theme footer{
+          color: #ddd;
+        }
+      
+         .dark-theme .brightness-icon {
+           color: #ddd;
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
+
 <body>
     <header>
-        <div class="container">
-            <h1 class="neon-glow">LiveStream Pro</h1>
-            <button id="theme-toggle" class="button button-outline" aria-label="Toggle dark mode">
-                <svg class="icon" viewBox="0 0 24 24" id="theme-toggle-icon">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                </svg>
-            </button>
-        </div>
+        <h1>LiveStream Pro</h1>
+        <i class="fas fa-sun brightness-icon" id="theme-toggle"></i>
     </header>
 
-    <main class="container">
-        <div class="card">
-            <div class="card-content">
-                <div class="video-container">
-                    <video id="video-feed" autoplay playsinline muted></video>
-                </div>
-              <div id="error-container"></div>
-                <div class="button-container">
-                    <div class="tooltip">
-                        <button id="stream-toggle" class="button">
-                            <svg class="icon" viewBox="0 0 24 24">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <polygon points="10 8 16 12 10 16 10 8"></polygon>
-                            </svg>
-                            Start Stream
-                        </button>
-                        <span class="tooltiptext">Start a new live stream</span>
-                    </div>
-                    <div class="tooltip">
-                      <button id="camera-switch" class="button button-outline">
-                          <svg class="icon" viewBox="0 0 24 24">
-                            <path d="M18 10c0-3.3-2.7-6-6-6-2.3 0-4.3 1.3-5.2 3l-2.6-2a8 8 0 0 1 12.8 10.4l-2.6-2C16.3 13.1 18 11.7 18 10zM6 14c0 3.3 2.7 6 6 6 2.3 0 4.3-1.3 5.2-3l2.6 2a8 8 0 0 1-12.8-10.4l2.6 2C7.7 12.9 6 14.3 6 14z"></path>
-                          </svg>
-                          Switch Camera
-                      </button>
-                      <span class="tooltiptext">Switch between front and back cameras</span>
-                    </div>
-                    <div class="tooltip">
-                        <button id="generate-link" class="button button-outline" disabled>
-                            <svg class="icon" viewBox="0 0 24 24">
-                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-                            </svg>
-                            Generate Shareable Link
-                        </button>
-                        <span class="tooltiptext">Create a link to share your live stream</span>
-                    </div>
-                </div>
-                <input id="share-link" type="text" class="input" readonly placeholder="Generated share link will appear here" style="display: none;">
-            </div>
+    <main class="stream-container">
+        <div class="stream-area">
+            <video id="local-video" autoplay playsinline muted></video>
+        </div>
+        <div class="button-container">
+            <button id="start-stream-btn">Start Stream</button>
+            <button id="generate-link-btn">Generate Shareable Link</button>
+            <button id="switch-camera-btn">
+                <i class="fas fa-camera"></i> Switch Camera
+            </button>
         </div>
     </main>
 
-    <footer>
-        <div class="container">
-            <p>© 2023 LiveStream Pro. All rights reserved.</p>
+    <div id="shareModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">×</span>
+            <h2>Share Link</h2>
+            <div class="share-link-container">
+                <input type="text" id="share-link" value="Waiting for camera to start" readonly>
+                <button onclick="copyToClipboard('share-link')" disabled>Copy Link</button>
+            </div>
         </div>
+    </div>
+
+    <footer>
+        <p>© 2024 LiveStream Pro. All rights reserved. Web Developed By shamase.co</p>
     </footer>
 
     <script>
-    // Theme toggle functionality
-    const themeToggle = document.getElementById('theme-toggle');
-    const themeToggleIcon = document.getElementById('theme-toggle-icon');
-    const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
-
-    function setTheme(isDark) {
-        document.body.classList.toggle('dark', isDark);
-        themeToggleIcon.innerHTML = isDark
-            ? '<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>'
-            : '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    }
-
-    // Set initial theme
-    const savedTheme = localStorage.getItem('theme');
-    setTheme(savedTheme === 'dark' || (savedTheme === null && prefersDarkScheme.matches));
-
-    themeToggle.addEventListener('click', () => {
-        setTheme(!document.body.classList.contains('dark'));
-    });
-
-        // Live streaming functionality
-        const videoFeed = document.getElementById('video-feed');
-        const streamToggle = document.getElementById('stream-toggle');
-        const generateLinkBtn = document.getElementById('generate-link');
-        const shareLinkInput = document.getElementById('share-link');
-        const cameraSwitchBtn = document.getElementById('camera-switch');
-        const errorContainer = document.getElementById('error-container');
-
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        const localVideo = document.getElementById('local-video');
+        const startStreamBtn = document.getElementById('start-stream-btn');
+        const switchCameraBtn = document.getElementById('switch-camera-btn');
+        let isDarkTheme = false;
         let stream;
-        let peerConnection;
-        let currentCamera = 'user'; // 'user' for front camera, 'environment' for back
         let isStreaming = false;
+        let currentCamera = 0;
+        let cameras = [];
 
-        function displayError(message) {
-            errorContainer.innerHTML = `<div class="error-message">${message}</div>`;
+        const modal = document.getElementById('shareModal');
+        const openModalBtn = document.getElementById('generate-link-btn');
+        const closeModalBtn = document.querySelector(".close-modal");
+        const shareLinkInput = document.getElementById('share-link')
+         const copyButton = document.querySelector('.modal-content button')
+
+
+        themeToggle.addEventListener('click', () => {
+            isDarkTheme = !isDarkTheme;
+            body.classList.toggle('dark-theme', isDarkTheme);
+            themeToggle.classList.toggle('fa-sun', !isDarkTheme);
+            themeToggle.classList.toggle('fa-moon', isDarkTheme);
+        });
+
+        const getCameras = async () => {
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                cameras = devices.filter(device => device.kind === 'videoinput');
+                if (cameras.length > 0) {
+                    console.log('Cameras found:', cameras);
+                    startStreamBtn.disabled = false;
+                    switchCameraBtn.disabled = false;
+                } else {
+                    console.warn('No cameras found.');
+                    startStreamBtn.disabled = true;
+                    switchCameraBtn.disabled = true;
+                    alert('No cameras found, the app will not work')
+                }
+            } catch (error) {
+                console.error('Error getting cameras:', error)
+                startStreamBtn.disabled = true;
+                switchCameraBtn.disabled = true;
+                alert('Could not access device list')
+            }
         }
-        
-        function clearError() {
-          errorContainer.innerHTML = '';
-        }
 
+        const startStream = async () => {
+            if (isStreaming) {
+                stopStream();
+                return;
+            }
 
-        async function getMediaStream() {
+            if (cameras.length === 0) {
+                alert('No cameras found.');
+                return;
+            }
             try {
                 const constraints = {
                     video: {
-                        facingMode: currentCamera,
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
+                        deviceId: { exact: cameras[currentCamera].deviceId }
                     },
-                    audio: true
+                    audio: false,
                 };
-                console.log("Attempting to get media stream with constraints:", constraints); // Add this log
-                const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-                console.log("Media stream obtained successfully:", mediaStream);  // Add this log
-                return mediaStream;
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                localVideo.srcObject = stream;
+                localVideo.style.display = 'block';
+                startStreamBtn.textContent = 'Stop Stream';
+                isStreaming = true;
+
+                 // Replace with your actual server-side logic
+                //Example: Assuming we get a stream ID from the server:
+                 const streamId = generateStreamId()
+                
+                 const streamUrl = `http://your-server-url/live/${streamId}` 
+                
+                 shareLinkInput.value = streamUrl;
+                 copyButton.disabled = false;
+                
+                
             } catch (error) {
-                console.error('Error accessing media devices:', error);
-                displayError('Unable to access camera and microphone. Please check your permissions or camera access.');
-              return null;
-            }
-        }
-
-
-      async function setupWebRTC() {
-        peerConnection = new RTCPeerConnection({
-            iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
-        });
-
-        peerConnection.onicecandidate = (event) => {
-            if (event.candidate) {
-                const link = localStorage.getItem('streamLink');
-                if (link) {
-                  localStorage.setItem(link + '_candidate', JSON.stringify(event.candidate));
-                }
+                console.error('Error starting stream:', error);
+                alert('Could not start the stream. Please check camera permission.');
+                stopStream()
+                 shareLinkInput.value = 'Camera start error';
+                copyButton.disabled = true;
             }
         };
 
-          peerConnection.ontrack = (event) => {
-              videoFeed.srcObject = event.streams[0];
-          };
-      }
+        const stopStream = () => {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                localVideo.srcObject = null;
+                localVideo.style.display = 'none';
+                stream = null;
+                startStreamBtn.textContent = 'Start Stream';
+                isStreaming = false;
+                shareLinkInput.value = 'Waiting for camera to start'
+                copyButton.disabled = true
+            }
+        };
+        
+          const generateStreamId = () =>{
+               return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+          }
 
-
-      async function startStream() {
-            clearError();
-        if(isStreaming) return;
-        isStreaming = true;
-            stream = await getMediaStream();
-
-        if (!stream) {
-          isStreaming = false;
-          return;
+        const switchCamera = () => {
+            if (cameras.length === 0 || !isStreaming) {
+                return
+            }
+            currentCamera = (currentCamera + 1) % cameras.length;
+            stopStream();
+            startStream();
         }
 
-            videoFeed.srcObject = stream;
-            streamToggle.innerHTML = `
-                <svg class="icon" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <rect x="9" y="9" width="6" height="6"></rect>
-                </svg>
-                Stop Stream
-            `;
-            generateLinkBtn.disabled = false;
+        startStreamBtn.addEventListener('click', startStream);
+        switchCameraBtn.addEventListener('click', switchCamera);
 
-            await setupWebRTC();
-
-          stream.getTracks().forEach(track => {
-            peerConnection.addTrack(track, stream);
+        openModalBtn.addEventListener('click', () => {
+            modal.style.display = 'block';
         });
 
-           // Animate the start of the stream
-            gsap.from(videoFeed, {
-                duration: 1,
-                opacity: 0,
-                scale: 0.8,
-                ease: 'elastic.out(1, 0.5)'
-            });
-        }
+        closeModalBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
 
-      function stopStream() {
-            if (stream) {
-              stream.getTracks().forEach(track => track.stop());
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
             }
-            videoFeed.srcObject = null;
-            streamToggle.innerHTML = `
-                <svg class="icon" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polygon points="10 8 16 12 10 16 10 8"></polygon>
-                </svg>
-                Start Stream
-            `;
-            generateLinkBtn.disabled = true;
-            shareLinkInput.style.display = 'none';
-            localStorage.removeItem(localStorage.getItem('streamLink'));
+        })
 
-            if (peerConnection) {
-              peerConnection.close();
-              peerConnection = null;
-            }
-            isStreaming = false;
-
-          // Animate the end of the stream
-            gsap.to(videoFeed, {
-                duration: 0.5,
-                opacity: 0,
-                scale: 0.8,
-                ease: 'power2.out',
-                onComplete: () => {
-                  videoFeed.style.opacity = 1;
-                  videoFeed.style.transform = 'scale(1)';
-                }
-            });
-      }
-
-      streamToggle.addEventListener('click', () => {
-          if (streamToggle.textContent.trim() === 'Start Stream') {
-              startStream();
-          } else {
-              stopStream();
-          }
-      });
-
-    generateLinkBtn.addEventListener('click', async () => {
-        try {
-          const randomId = Math.random().toString(36).substring(2, 15);
-          const link = `${window.location.origin}/index.html/${randomId}`;
-          shareLinkInput.value = link;
-          shareLinkInput.style.display = 'block';
-          localStorage.setItem('streamLink', link);
-
-          const offer = await peerConnection.createOffer();
-          await peerConnection.setLocalDescription(offer);
-
-          localStorage.setItem(link, JSON.stringify(offer));
-
-          // Animate the link generation
-          gsap.from(shareLinkInput, {
-            duration: 0.5,
-            y: 20,
-            opacity: 0,
-            ease: 'back.out(1.7)'
-          });
-        } catch(error) {
-          console.error("Error generating the link", error)
-          displayError("Error generating the link. Please try again.");
-        }
-    });
-
-      // Handle camera switching
-      cameraSwitchBtn.addEventListener('click', async () => {
-        if (!stream) return;
-
-          stream.getTracks().forEach(track => track.stop());
-
-          currentCamera = currentCamera === 'user' ? 'environment' : 'user';
-          await startStream();
-
-      });
-      // Check if it's a viewer
-      const path = window.location.pathname;
-
-      if (path.startsWith('/stream/')) {
-          const streamId = path.split('/')[2];
-        const offerString = localStorage.getItem(streamId);
-
-          if (offerString) {
-            const offer = JSON.parse(offerString);
-            startStreamForViewer(offer, streamId);
-          } else {
-            displayError("No stream found for this link");
-          }
-      }
-
-     async function startStreamForViewer(offer, streamId) {
-       streamToggle.disabled = true;
-       generateLinkBtn.disabled = true;
-
-       try {
-         await setupWebRTC();
-         await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-
-         const answer = await peerConnection.createAnswer();
-         await peerConnection.setLocalDescription(answer);
-
-          //Get candiate of the stream and add them to the peer
-          const candidateString = localStorage.getItem(streamId + '_candidate');
-
-         if(candidateString) {
-          const candidate = JSON.parse(candidateString);
-          await peerConnection.addIceCandidate(candidate);
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            element.select();
+            element.setSelectionRange(0, 99999); // For mobile
+            navigator.clipboard.writeText(element.value);
+            alert('Link copied to clipboard')
         }
 
-
-          // Animate the start of the stream
-          gsap.from(videoFeed, {
-            duration: 1,
-            opacity: 0,
-            scale: 0.8,
-            ease: 'elastic.out(1, 0.5)'
-          });
-
-      } catch (error) {
-        console.error("Error starting the stream as a viewer", error);
-        displayError("Failed to start the stream for the viewer.");
-      }
-    }
-    // Clean up on page unload
-    window.addEventListener('beforeunload', () => {
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-        }
-        if (peerConnection) {
-            peerConnection.close();
-            peerConnection = null;
-        }
-    });
+        getCameras();
     </script>
 </body>
+
 </html>
